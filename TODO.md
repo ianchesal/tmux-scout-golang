@@ -1,6 +1,16 @@
 # TODO
 
-## Option C: Pre-built Binaries via GitHub Releases
+Things that are on my list to knock off.
+
+## Test with Codex
+
+I don't actually use Codex so none of the Codex paths are actually tested at this point. Only the Claude paths are known to work. I should rectify that at some point and actually test with Codex.
+
+## Add a screen recording to the README
+
+I ended up dropping the one that came from the original repo because it was for the original plugin and not this version.
+
+## Provide pre-built binaries for easier installation
 
 Remove the Go requirement for end users by shipping pre-built binaries as GitHub Release assets and having `tmux-scout.tmux` download the right one on first load.
 

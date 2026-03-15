@@ -1,14 +1,12 @@
 # tmux-scout-golang
 
-This started out as a Golang rewrite of
-[tmux-scout](https://github.com/qeesung/tmux-scout). All credit for the genesis
-of this belongs to [qeesung](https://github.com/qeesung).
+This started out as a Golang rewrite of [tmux-scout](https://github.com/qeesung/tmux-scout). All credit for the genesis of this belongs to [qeesung](https://github.com/qeesung). 
 
-A tmux plugin for monitoring and navigating [Claude
-Code](https://docs.anthropic.com/en/docs/claude-code) and
-[Codex](https://github.com/openai/codex) sessions. Provides a real-time fzf
-picker to jump between agent panes, a status bar widget showing session counts,
-and crash detection for dead sessions.
+A tmux plugin for monitoring and navigating [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [Codex](https://github.com/openai/codex) sessions. Provides a real-time fzf picker to jump between agent panes, a status bar widget showing session counts, and crash detection for dead sessions.
+
+## WARNING
+
+This is still a work in progress. As of now, only the Claude Code paths have been tested. The Codex stuff probably works, but is completely untested.
 
 ## Features
 
@@ -175,13 +173,14 @@ Sessions older than 24 hours are automatically cleaned up.
 
 ## Known Issues
 
-Codex has an extremely poor hook mechanism — it only provides a single `notify` hook that fires after each agent turn completes (`agent-turn-complete`). No session start, no session end, no tool use events, nothing. This causes two issues:
+* None of the Codex paths have been tested
 
-- **Unable to jump to new sessions** — Before Codex completes its first response, tmux-scout has no way to know which pane the session is running in. These sessions appear as "unbound" in the picker and cannot be jumped to until the first turn finishes.
-- **Inconsistent session info** — Critical events like session start, prompt submission, tool use, and session end are completely missing from Codex's hook. This means session status can be outright wrong — a session may show as "completed" while Codex is actively processing, or show as "working" long after it has finished.
 
-These are fundamental limitations of Codex's hook design, not bugs in tmux-scout. We have implemented several workarounds to compensate: JSONL log file polling for early session discovery, crash detection via process liveness checks, file staleness detection for dead sessions, and pending tool call tracking from JSONL parsing. But don't worry — tmux-scout will eventually converge to the correct state.
+## See Also
+
+* [qeesung/tmux-scout](https://github.com/qeesung/tmux-scout) -- the genesis for this project came about after they posted this to the r/tmux sub-reddit. I wanted a binary approach to doing what they were doing and took on rewriting it all in Golang. All credit belongs to qeesung for the original idea and implementation here.
+
 
 ## License
 
-MIT
+[MIT](LICENSE)
