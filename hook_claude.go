@@ -134,6 +134,13 @@ func runHookClaude() {
 
 	now := NowMs()
 
+	// Any hook event (except SessionEnd) proves the session is alive — clear stale crash/end state.
+	if payload.HookEventName != "SessionEnd" && session.EndedAt != nil {
+		session.EndedAt = nil
+		session.CrashReason = ""
+		session.Status = "idle"
+	}
+
 	switch payload.HookEventName {
 	case "SessionStart":
 		session.Status = "idle"

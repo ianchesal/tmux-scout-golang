@@ -106,6 +106,17 @@ func reconcileSessions(scoutDir string, sf *StatusFile, panes map[string]paneInf
 		}
 		var reason string
 		if s.PID != nil && *s.PID > 0 && !pidAlive(*s.PID) {
+			// If the pane is still running a non-shell command (e.g. "claude"), the stored PID
+			// was likely a short-lived wrapper process.  Update to the pane's current PID
+			// instead of marking the session as crashed.
+			if !isShellCommand(pane.CurrentCommand) && pane.PanePID > 0 {
+				s.PID = &pane.PanePID
+				s.LastUpdated = now
+				sf.Sessions[id] = s
+				_ = WriteSession(scoutDir, s)
+				changed = true
+				continue
+			}
 			reason = fmt.Sprintf("pid %d exited while pane %s remained open", *s.PID, *s.TmuxPane)
 		} else if s.PID == nil && canUseShellFallback(s) && isShellCommand(pane.CurrentCommand) {
 			reason = fmt.Sprintf("pane %s returned to shell %s", *s.TmuxPane, pane.CurrentCommand)
