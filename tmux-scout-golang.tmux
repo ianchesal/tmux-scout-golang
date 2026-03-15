@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Build binary if missing (e.g. after TPM install)
+# Build binary if missing or outdated (e.g. after TPM install or update)
+_needs_build=false
 if [ ! -f "$CURRENT_DIR/bin/tmux-scout" ]; then
+  _needs_build=true
+elif [ -n "$(find "$CURRENT_DIR" -maxdepth 1 -name '*.go' -newer "$CURRENT_DIR/bin/tmux-scout" 2>/dev/null)" ]; then
+  _needs_build=true
+fi
+if [ "$_needs_build" = "true" ]; then
   if command -v go >/dev/null 2>&1; then
     tmux display-message "tmux-scout: building binary (requires Go)..."
     if ! (cd "$CURRENT_DIR" && go build -o bin/tmux-scout . 2>/tmp/tmux-scout-build.log); then
