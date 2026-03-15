@@ -51,7 +51,7 @@ Reload tmux: `tmux source ~/.tmux.conf`
 
 ## Building from Source
 
-Requires Go 1.21+.
+Requires Go 1.21+. CI tests against Go 1.21, 1.22, 1.23, and the current stable release.
 
 ```bash
 git clone https://github.com/ianchesal/tmux-scout-golang.git
