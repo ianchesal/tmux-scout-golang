@@ -43,4 +43,4 @@ make release    # cross-compile for linux/darwin amd64/arm64
 ## Key Constraints
 
 - No external Go dependencies — stdlib only
-- Shell scripts (`tmux-scout.tmux`, `scripts/picker/picker.sh`, `scripts/status-widget.sh`) call the Go binary
+- Shell scripts (`tmux-scout-golang.tmux`, `scripts/picker/picker.sh`, `scripts/status-widget.sh`) call the Go binary

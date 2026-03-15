@@ -46,7 +46,7 @@ git clone https://github.com/ianchesal/tmux-scout-golang.git ~/.tmux/plugins/tmu
 Add to `~/.tmux.conf`:
 
 ```bash
-run-shell ~/.tmux/plugins/tmux-scout-golang/tmux-scout.tmux
+run-shell ~/.tmux/plugins/tmux-scout-golang/tmux-scout-golang.tmux
 ```
 
 Reload tmux: `tmux source ~/.tmux.conf`
