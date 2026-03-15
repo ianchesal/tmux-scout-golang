@@ -27,13 +27,15 @@ and crash detection for dead sessions.
 
 ### With [TPM](https://github.com/tmux-plugins/tpm)
 
+Requires Go 1.21+ on your `$PATH` — the plugin compiles itself on first load.
+
 Add to `~/.tmux.conf`:
 
 ```bash
 set -g @plugin 'ianchesal/tmux-scout-golang'
 ```
 
-Then press `prefix + I` to install.
+Press `prefix + I` to install. On the next tmux reload, the binary is compiled automatically. A build failure will show as a tmux message with a log path.
 
 ### Manual
 
