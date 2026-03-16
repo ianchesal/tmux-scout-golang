@@ -1,4 +1,4 @@
-# tmux-scout
+# tmux-scout-golang
 
 A tmux plugin for monitoring and navigating Claude Code and Codex sessions. Provides a real-time fzf picker, status bar widget, and crash detection.
 
