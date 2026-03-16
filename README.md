@@ -1,6 +1,12 @@
 # tmux-scout-golang
 
+[![CI](https://github.com/ianchesal/tmux-scout-golang/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ianchesal/tmux-scout-golang/actions/workflows/ci.yml)
 [![Security Scanning](https://github.com/ianchesal/tmux-scout-golang/actions/workflows/security.yml/badge.svg)](https://github.com/ianchesal/tmux-scout-golang/actions/workflows/security.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ianchesal/tmux-scout-golang)](https://goreportcard.com/report/github.com/ianchesal/tmux-scout-golang)
+[![Latest Release](https://img.shields.io/github/v/release/ianchesal/tmux-scout-golang)](https://github.com/ianchesal/tmux-scout-golang/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+![tmux-scout-golang picker](tmux-scout-golang-picker.png)
 
 This started out as a Golang rewrite of [tmux-scout](https://github.com/qeesung/tmux-scout). All credit for the genesis of this belongs to [qeesung](https://github.com/qeesung). 
 
