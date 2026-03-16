@@ -1,0 +1,34 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build release binaries
+        run: make release
+      - name: Generate SHA256SUMS
+        run: (cd bin && sha256sum tmux-scout-*) > SHA256SUMS
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            bin/tmux-scout-linux-amd64 \
+            bin/tmux-scout-linux-arm64 \
+            bin/tmux-scout-darwin-amd64 \
+            bin/tmux-scout-darwin-arm64 \
+            SHA256SUMS \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes
