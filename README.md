@@ -1,5 +1,7 @@
 # tmux-scout-golang
 
+[![Security Scanning](https://github.com/ianchesal/tmux-scout-golang/actions/workflows/security.yml/badge.svg)](https://github.com/ianchesal/tmux-scout-golang/actions/workflows/security.yml)
+
 This started out as a Golang rewrite of [tmux-scout](https://github.com/qeesung/tmux-scout). All credit for the genesis of this belongs to [qeesung](https://github.com/qeesung). 
 
 A tmux plugin for monitoring and navigating [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [Codex](https://github.com/openai/codex) sessions. Provides a real-time fzf picker to jump between agent panes, a status bar widget showing session counts, and crash detection for dead sessions.
@@ -175,6 +177,20 @@ Sessions older than 24 hours are automatically cleaned up.
 
 * None of the Codex paths have been tested
 
+
+## Verifying Downloads
+
+Release binaries come with a `SHA256SUMS` file. To verify before running:
+
+**Linux:**
+```bash
+sha256sum -c SHA256SUMS
+```
+
+**macOS:**
+```bash
+shasum -a 256 -c SHA256SUMS
+```
 
 ## See Also
 
