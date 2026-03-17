@@ -73,6 +73,18 @@ To run tests:
 make test
 ```
 
+## Releasing
+
+> **Note:** Only repository admins can push `v*` tags. Releases are restricted to admins via GitHub tag protection rules.
+
+Update `.version`, commit and push to `main`, then:
+
+```bash
+make tag
+```
+
+This checks that the working tree is clean, you're on `main`, there are no unpushed commits, and the tag doesn't already exist — then runs the test suite, creates the tag, and pushes it to trigger the GitHub Actions release workflow.
+
 ## Hook Setup
 
 tmux-scout needs hooks installed in Claude Code, Codex, and/or Gemini CLI to track sessions. Run the setup command after installation:
