@@ -81,11 +81,19 @@ if [ "$_installed" != "$_expected" ]; then
       _ver_flag=$(cat "$CURRENT_DIR/.version" 2>/dev/null || echo "dev")
       tmux display-message "tmux-scout: building binary (requires Go)..."
       if ! (cd "$CURRENT_DIR" && go build -ldflags "-X main.version=${_ver_flag}" -o bin/tmux-scout . 2>/tmp/tmux-scout-build.log); then
-        tmux display-message "tmux-scout: download failed and build failed — see /tmp/tmux-scout-build.log"
+        if [ -n "$_os" ] && [ -n "$_arch" ]; then
+          tmux display-message "tmux-scout: download failed and build failed — see /tmp/tmux-scout-build.log"
+        else
+          tmux display-message "tmux-scout: unsupported platform and build failed — see /tmp/tmux-scout-build.log"
+        fi
         return 1 2>/dev/null || exit 1
       fi
     else
-      tmux display-message "tmux-scout: download failed and Go not found. Install Go or manually place the binary at bin/tmux-scout"
+      if [ -n "$_os" ] && [ -n "$_arch" ]; then
+        tmux display-message "tmux-scout: download failed and Go not found. Install Go or manually place the binary at bin/tmux-scout"
+      else
+        tmux display-message "tmux-scout: unsupported platform. Install Go to build from source."
+      fi
       return 1 2>/dev/null || exit 1
     fi
   fi
