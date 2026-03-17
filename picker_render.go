@@ -121,6 +121,8 @@ func formatLine(s Session, currentPane string) string {
 	agent := "\x1b[38;5;209mclaude\x1b[0m"
 	if s.AgentType == "codex" {
 		agent = "\x1b[38;5;114mcodex \x1b[0m"
+	} else if s.AgentType == "gemini" {
+		agent = "\x1b[38;5;33mgemini\x1b[0m"
 	}
 
 	projectName := filepath.Base(s.WorkingDirectory)

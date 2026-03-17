@@ -14,7 +14,7 @@ func main() {
 	switch os.Args[1] {
 	case "hook":
 		if len(os.Args) < 3 {
-			fmt.Fprintln(os.Stderr, "usage: tmux-scout hook claude|codex [json]")
+			fmt.Fprintln(os.Stderr, "usage: tmux-scout hook claude|codex|gemini")
 			os.Exit(1)
 		}
 		switch os.Args[2] {
@@ -26,6 +26,8 @@ func main() {
 				jsonArg = os.Args[3]
 			}
 			runHookCodex(jsonArg)
+		case "gemini":
+			runHookGemini()
 		default:
 			fmt.Fprintf(os.Stderr, "unknown hook type: %s\n", os.Args[2])
 			os.Exit(1)
@@ -53,7 +55,8 @@ func printUsage() {
 Commands:
   hook claude              Receive Claude Code hook event from stdin
   hook codex [json]        Receive Codex agent-turn-complete event
-  setup install|uninstall|status [--claude] [--codex] [--quiet]
+  hook gemini              Receive Gemini CLI hook event from stdin
+  setup install|uninstall|status [--claude] [--codex] [--gemini] [--quiet]
                            Manage tmux-scout hooks
   picker <status-file> <current-pane>
                            Output fzf-ready session list
