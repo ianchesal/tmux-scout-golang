@@ -10,11 +10,11 @@
 
 This started out as a Golang rewrite of [tmux-scout](https://github.com/qeesung/tmux-scout). All credit for the genesis of this belongs to [qeesung](https://github.com/qeesung). 
 
-A tmux plugin for monitoring and navigating [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [Codex](https://github.com/openai/codex) sessions. Provides a real-time fzf picker to jump between agent panes, a status bar widget showing session counts, and crash detection for dead sessions.
+A tmux plugin for monitoring and navigating [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex](https://github.com/openai/codex), and [Gemini CLI](https://github.com/google-gemini/gemini-cli) sessions. Provides a real-time fzf picker to jump between agent panes, a status bar widget showing session counts, and crash detection for dead sessions.
 
 ## WARNING
 
-This is still a work in progress. As of now, only the Claude Code paths have been tested. The Codex stuff probably works, but is completely untested.
+This is still a work in progress. As of now, only the Claude Code paths have been thoroughly tested. The Codex and Gemini CLI paths probably work, but are less tested.
 
 ## Features
 
@@ -75,15 +75,18 @@ make test
 
 ## Hook Setup
 
-tmux-scout needs hooks installed in Claude Code and/or Codex to track sessions. Run the setup command after installation:
+tmux-scout needs hooks installed in Claude Code, Codex, and/or Gemini CLI to track sessions. Run the setup command after installation:
 
 ```bash
 # SCOUT_DIR is set automatically when the plugin loads — these commands can be copy-pasted directly
 eval "$(tmux show-env -g SCOUT_DIR)" && "$SCOUT_DIR/scripts/setup.sh" install
 
-# Other operations
+# Install for specific agents only
 eval "$(tmux show-env -g SCOUT_DIR)" && "$SCOUT_DIR/scripts/setup.sh" install --claude   # Claude Code only
 eval "$(tmux show-env -g SCOUT_DIR)" && "$SCOUT_DIR/scripts/setup.sh" install --codex    # Codex only
+eval "$(tmux show-env -g SCOUT_DIR)" && "$SCOUT_DIR/scripts/setup.sh" install --gemini   # Gemini CLI only
+
+# Other operations
 eval "$(tmux show-env -g SCOUT_DIR)" && "$SCOUT_DIR/scripts/setup.sh" uninstall          # Remove all hooks
 eval "$(tmux show-env -g SCOUT_DIR)" && "$SCOUT_DIR/scripts/setup.sh" status             # Check installation status
 ```
@@ -94,6 +97,7 @@ The installer is **idempotent** — running it multiple times is safe. If you mo
 
 - **Claude Code**: Adds a hook entry to each of the 6 event types in `~/.claude/settings.json`
 - **Codex**: Sets the `notify` field in `~/.codex/config.toml` (original notify command is backed up and chained)
+- **Gemini CLI**: Adds a hook entry to each of the 7 event types in `~/.gemini/settings.json`
 
 ## Usage
 
@@ -116,7 +120,7 @@ Each line shows:
 
 - `*` — current pane indicator
 - `[ WAIT ]` / `[ BUSY ]` / `[ DONE ]` / `[ IDLE ]` — session status
-- Agent type (claude / codex)
+- Agent type (claude / codex / gemini)
 - Project directory name
 - Session title (first prompt)
 - Current tool details (for working sessions)
@@ -181,7 +185,7 @@ Sessions older than 24 hours are automatically cleaned up.
 
 ## Known Issues
 
-* None of the Codex paths have been tested
+* The Codex and Gemini CLI paths are less tested than the Claude Code paths
 
 
 ## Verifying Downloads

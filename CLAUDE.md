@@ -1,6 +1,6 @@
 # tmux-scout-golang
 
-A tmux plugin for monitoring and navigating Claude Code and Codex sessions. Provides a real-time fzf picker, status bar widget, and crash detection.
+A tmux plugin for monitoring and navigating Claude Code, Codex, and Gemini CLI sessions. Provides a real-time fzf picker, status bar widget, and crash detection.
 
 ## Tech Stack
 
@@ -23,7 +23,8 @@ make release    # cross-compile for linux/darwin amd64/arm64
 |---|---|
 | `hook claude` | Process Claude Code hook events (reads env vars, updates session JSON) |
 | `hook codex [json]` | Process Codex notify hook events |
-| `setup install\|uninstall\|status [--claude\|--codex]` | Install/remove hooks in Claude Code and Codex configs |
+| `hook gemini` | Process Gemini CLI hook events (reads env vars, updates session JSON) |
+| `setup install\|uninstall\|status [--claude\|--codex\|--gemini]` | Install/remove hooks in Claude Code, Codex, and Gemini CLI configs |
 | `picker <status-file> <current-pane>` | Render fzf picker lines |
 | `picker sync` | Sync session state (poll Codex JSONL, detect crashes) |
 | `status-bar` | Emit status bar widget string |
@@ -35,8 +36,8 @@ make release    # cross-compile for linux/darwin amd64/arm64
 **Go file layout (flat `package main`):**
 - `main.go` — CLI dispatch
 - `store.go` — types + session read/write
-- `hook_claude.go`, `hook_codex.go` — hook handlers
-- `setup.go`, `setup_claude.go`, `setup_codex.go` — installer
+- `hook_claude.go`, `hook_codex.go`, `hook_gemini.go` — hook handlers
+- `setup.go`, `setup_claude.go`, `setup_codex.go`, `setup_gemini.go` — installer
 - `picker.go`, `picker_sync.go`, `picker_render.go` — picker logic
 - `status_bar.go` — status widget
 

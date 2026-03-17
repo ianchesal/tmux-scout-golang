@@ -7,29 +7,36 @@ import (
 
 func runSetup(args []string) {
 	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: tmux-scout setup install|uninstall|status [--claude] [--codex] [--quiet]")
+		fmt.Fprintln(os.Stderr, "usage: tmux-scout setup install|uninstall|status [--claude] [--codex] [--gemini] [--quiet]")
 		os.Exit(1)
 	}
 
 	cmd := args[0]
-	doClaude, doCodex, quiet := true, true, false
+	doClaude, doCodex, doGemini, quiet := true, true, true, false
 	explicitTarget := false
 
 	for _, a := range args[1:] {
 		switch a {
 		case "--claude":
 			if !explicitTarget {
-				doClaude, doCodex = true, false
+				doClaude, doCodex, doGemini = true, false, false
 				explicitTarget = true
 			} else {
 				doClaude = true
 			}
 		case "--codex":
 			if !explicitTarget {
-				doClaude, doCodex = false, true
+				doClaude, doCodex, doGemini = false, true, false
 				explicitTarget = true
 			} else {
 				doCodex = true
+			}
+		case "--gemini":
+			if !explicitTarget {
+				doClaude, doCodex, doGemini = false, false, true
+				explicitTarget = true
+			} else {
+				doGemini = true
 			}
 		case "--quiet":
 			quiet = true
@@ -40,6 +47,7 @@ func runSetup(args []string) {
 	scoutDir := defaultScoutDir()
 	claudeSettings := home + "/.claude/settings.json"
 	codexConfig := home + "/.codex/config.toml"
+	geminiSettings := home + "/.gemini/settings.json"
 	binPath := binaryPath()
 
 	switch cmd {
@@ -60,6 +68,14 @@ func runSetup(args []string) {
 				fmt.Println("Codex:", result)
 			}
 		}
+		if doGemini {
+			result, err := geminiInstall(geminiSettings, binPath)
+			if err != nil && !quiet {
+				fmt.Fprintf(os.Stderr, "Gemini: %v\n", err)
+			} else if !quiet {
+				fmt.Println("Gemini:", result)
+			}
+		}
 
 	case "uninstall":
 		if doClaude {
@@ -78,6 +94,14 @@ func runSetup(args []string) {
 				fmt.Println("Codex:", result)
 			}
 		}
+		if doGemini {
+			result, err := geminiUninstall(geminiSettings)
+			if err != nil && !quiet {
+				fmt.Fprintf(os.Stderr, "Gemini: %v\n", err)
+			} else if !quiet {
+				fmt.Println("Gemini:", result)
+			}
+		}
 
 	case "status":
 		if quiet {
@@ -92,6 +116,12 @@ func runSetup(args []string) {
 			if doCodex {
 				installed, _ := codexStatus(codexConfig)
 				if !installed {
+					allOK = false
+				}
+			}
+			if doGemini {
+				n, _ := geminiStatus(geminiSettings)
+				if n < len(geminiHookEvents) {
 					allOK = false
 				}
 			}
@@ -113,6 +143,10 @@ func runSetup(args []string) {
 			} else {
 				fmt.Println("Codex:       hook not installed")
 			}
+		}
+		if doGemini {
+			n, _ := geminiStatus(geminiSettings)
+			fmt.Printf("Gemini:      %d/%d hooks installed\n", n, len(geminiHookEvents))
 		}
 		fmt.Println("Binary:     ", binPath)
 

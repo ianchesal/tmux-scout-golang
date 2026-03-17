@@ -7,28 +7,28 @@ import (
 	"strings"
 )
 
-const (
-	claudeHookIdentifierNew = "tmux-scout hook claude"
-	claudeHookIdentifierOld = "tmux-scout/scripts/hooks/claude.js"
-)
+const geminiHookIdentifier = "tmux-scout hook gemini"
 
-var claudeHookEvents = []string{
-	"SessionStart", "UserPromptSubmit", "PreToolUse",
-	"PostToolUse", "Stop", "SessionEnd",
+var geminiHookEvents = []string{
+	"SessionStart", "SessionEnd",
+	"BeforeAgent", "AfterAgent",
+	"BeforeTool", "AfterTool",
+	"Notification",
 }
 
-type claudeHookEntry struct {
+type geminiHookEntry struct {
+	Name    string `json:"name"`    // required by Gemini CLI hook schema; not present in Claude hook entries
 	Type    string `json:"type"`
 	Command string `json:"command"`
-	Timeout int    `json:"timeout"`
+	Timeout int    `json:"timeout"` // milliseconds (Gemini CLI), unlike Claude which uses seconds
 }
 
-type claudeMatcherGroup struct {
+type geminiMatcherGroup struct {
 	Matcher string            `json:"matcher"`
-	Hooks   []claudeHookEntry `json:"hooks"`
+	Hooks   []geminiHookEntry `json:"hooks"`
 }
 
-func claudeReadSettings(path string) (map[string]interface{}, error) {
+func geminiReadSettings(path string) (map[string]interface{}, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil, fmt.Errorf("settings.json not found")
 	}
@@ -43,7 +43,7 @@ func claudeReadSettings(path string) (map[string]interface{}, error) {
 	return s, nil
 }
 
-func claudeWriteSettings(path string, s map[string]interface{}) error {
+func geminiWriteSettings(path string, s map[string]interface{}) error {
 	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return err
@@ -52,12 +52,12 @@ func claudeWriteSettings(path string, s map[string]interface{}) error {
 	return writeAtomic(path, data)
 }
 
-func isScoutHook(cmd string) bool {
-	return strings.Contains(cmd, claudeHookIdentifierNew) || strings.Contains(cmd, claudeHookIdentifierOld)
+func isGeminiScoutHook(cmd string) bool {
+	return strings.Contains(cmd, geminiHookIdentifier)
 }
 
-func claudeInstall(settingsPath, binPath string) (string, error) {
-	s, err := claudeReadSettings(settingsPath)
+func geminiInstall(settingsPath, binPath string) (string, error) {
+	s, err := geminiReadSettings(settingsPath)
 	if err != nil {
 		return "skipped", nil
 	}
@@ -70,46 +70,45 @@ func claudeInstall(settingsPath, binPath string) (string, error) {
 		return "skipped", nil
 	}
 
-	newCmd := fmt.Sprintf("%s hook claude", binPath)
+	newCmd := fmt.Sprintf("%s hook gemini", binPath)
 	changed := false
 
-	for _, event := range claudeHookEvents {
-		var groups []claudeMatcherGroup
+	for _, event := range geminiHookEvents {
+		var groups []geminiMatcherGroup
 		if raw, ok := hooksMap[event]; ok {
 			b, _ := json.Marshal(raw)
 			_ = json.Unmarshal(b, &groups)
 		}
 
-		// Find or create catch-all group; always ensure it is at index 0 (prepended)
+		// Find or create "*" matcher group; always ensure it is at index 0.
 		catchAllIdx := -1
 		for i, g := range groups {
-			if g.Matcher == "" {
+			if g.Matcher == "*" {
 				catchAllIdx = i
 				break
 			}
 		}
 		if catchAllIdx < 0 {
-			groups = append([]claudeMatcherGroup{{Matcher: "", Hooks: []claudeHookEntry{}}}, groups...)
+			groups = append([]geminiMatcherGroup{{Matcher: "*", Hooks: []geminiHookEntry{}}}, groups...)
 			catchAllIdx = 0
 			changed = true
 		} else if catchAllIdx > 0 {
-			// Move existing catch-all to front
 			catchAll := groups[catchAllIdx]
-			groups = append([]claudeMatcherGroup{catchAll}, append(groups[:catchAllIdx], groups[catchAllIdx+1:]...)...)
+			groups = append([]geminiMatcherGroup{catchAll}, append(groups[:catchAllIdx], groups[catchAllIdx+1:]...)...)
 			catchAllIdx = 0
 			changed = true
 		}
 
-		// Find existing scout hook in catch-all
+		// Find existing scout hook in the "*" group (identity: command contains geminiHookIdentifier).
 		existingIdx := -1
 		for i, h := range groups[catchAllIdx].Hooks {
-			if isScoutHook(h.Command) {
+			if isGeminiScoutHook(h.Command) {
 				existingIdx = i
 				break
 			}
 		}
 
-		entry := claudeHookEntry{Type: "command", Command: newCmd, Timeout: 5}
+		entry := geminiHookEntry{Name: "tmux-scout", Type: "command", Command: newCmd, Timeout: 5000}
 		if existingIdx >= 0 {
 			if groups[catchAllIdx].Hooks[existingIdx].Command != newCmd {
 				groups[catchAllIdx].Hooks[existingIdx] = entry
@@ -125,7 +124,7 @@ func claudeInstall(settingsPath, binPath string) (string, error) {
 
 	if changed {
 		s["hooks"] = hooksMap
-		if err := claudeWriteSettings(settingsPath, s); err != nil {
+		if err := geminiWriteSettings(settingsPath, s); err != nil {
 			return "", err
 		}
 		return "installed", nil
@@ -133,8 +132,8 @@ func claudeInstall(settingsPath, binPath string) (string, error) {
 	return "ok", nil
 }
 
-func claudeUninstall(settingsPath string) (string, error) {
-	s, err := claudeReadSettings(settingsPath)
+func geminiUninstall(settingsPath string) (string, error) {
+	s, err := geminiReadSettings(settingsPath)
 	if err != nil {
 		return "skipped", nil
 	}
@@ -144,12 +143,12 @@ func claudeUninstall(settingsPath string) (string, error) {
 	}
 
 	changed := false
-	for _, event := range claudeHookEvents {
+	for _, event := range geminiHookEvents {
 		raw, ok := hooksMap[event]
 		if !ok {
 			continue
 		}
-		var groups []claudeMatcherGroup
+		var groups []geminiMatcherGroup
 		b, _ := json.Marshal(raw)
 		_ = json.Unmarshal(b, &groups)
 
@@ -157,7 +156,7 @@ func claudeUninstall(settingsPath string) (string, error) {
 			before := len(groups[gi].Hooks)
 			filtered := groups[gi].Hooks[:0]
 			for _, h := range groups[gi].Hooks {
-				if !isScoutHook(h.Command) {
+				if !isGeminiScoutHook(h.Command) {
 					filtered = append(filtered, h)
 				}
 			}
@@ -182,13 +181,13 @@ func claudeUninstall(settingsPath string) (string, error) {
 	}
 
 	if changed {
-		return "removed", claudeWriteSettings(settingsPath, s)
+		return "removed", geminiWriteSettings(settingsPath, s)
 	}
 	return "not_found", nil
 }
 
-func claudeStatus(settingsPath string) (int, error) {
-	s, err := claudeReadSettings(settingsPath)
+func geminiStatus(settingsPath string) (int, error) {
+	s, err := geminiReadSettings(settingsPath)
 	if err != nil {
 		return 0, nil
 	}
@@ -197,17 +196,17 @@ func claudeStatus(settingsPath string) (int, error) {
 		return 0, nil
 	}
 	count := 0
-	for _, event := range claudeHookEvents {
+	for _, event := range geminiHookEvents {
 		raw, ok := hooksMap[event]
 		if !ok {
 			continue
 		}
-		var groups []claudeMatcherGroup
+		var groups []geminiMatcherGroup
 		b, _ := json.Marshal(raw)
 		_ = json.Unmarshal(b, &groups)
 		for _, g := range groups {
 			for _, h := range g.Hooks {
-				if isScoutHook(h.Command) {
+				if isGeminiScoutHook(h.Command) {
 					count++
 				}
 			}

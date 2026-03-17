@@ -135,3 +135,17 @@ func TestGetActiveSessions_DeduplicateByPane(t *testing.T) {
 		t.Errorf("expected newest session, got %q", active[0].SessionID)
 	}
 }
+
+func TestFormatLine_GeminiAgent(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "gemini",
+		Status:           "idle",
+		WorkingDirectory: "/home/user/project",
+		TmuxPane:         strPtr("%9"),
+	}
+	line := formatLine(s, "")
+	if !strings.Contains(line, "gemini") {
+		t.Errorf("gemini agent label expected in line: %q", line)
+	}
+}
