@@ -13,6 +13,7 @@ A tmux plugin for monitoring and navigating Claude Code, Codex, and Gemini CLI s
 make build      # compile to bin/tmux-scout
 make test       # go test ./...
 make release    # cross-compile for linux/darwin amd64/arm64
+make tag        # verify preconditions, run tests, tag, and push to trigger GitHub release
 ```
 
 ## Architecture

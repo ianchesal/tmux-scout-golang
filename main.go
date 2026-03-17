@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 )
 
+var version = "dev" // overridden at build time via -ldflags "-X main.version=..."
+
 func main() {
 	if len(os.Args) < 2 {
 		printUsage()
@@ -42,6 +44,9 @@ func main() {
 		runPicker(os.Args[2], os.Args[3])
 	case "status-bar":
 		runStatusBar()
+	case "--version", "-version":
+		fmt.Println(version)
+		os.Exit(0)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
 		printUsage()
