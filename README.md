@@ -33,7 +33,7 @@ This is still a work in progress. As of now, only the Claude Code paths have bee
 
 ### With [TPM](https://github.com/tmux-plugins/tpm)
 
-Requires Go 1.21+ on your `$PATH` — the plugin compiles itself on first load.
+The binary is downloaded automatically on first load. If the download fails, the plugin falls back to building from source (requires Go).
 
 Add to `~/.tmux.conf`:
 
@@ -41,7 +41,7 @@ Add to `~/.tmux.conf`:
 set -g @plugin 'ianchesal/tmux-scout-golang'
 ```
 
-Press `prefix + I` to install. On the next tmux reload, the binary is compiled automatically. A build failure will show as a tmux message with a log path.
+Press `prefix + I` to install. On the next tmux reload, the binary is downloaded and verified automatically. If the download fails, Go is used to build from source. A failure at either stage shows as a tmux message.
 
 ### Manual
 
@@ -188,9 +188,11 @@ Sessions older than 24 hours are automatically cleaned up.
 * The Codex and Gemini CLI paths are less tested than the Claude Code paths
 
 
-## Verifying Downloads
+## Security
 
-Release binaries come with a `SHA256SUMS` file. To verify before running:
+Downloaded binaries are verified against `SHA256SUMS` before installation.
+
+Release binaries also come with a `SHA256SUMS` file for manual verification. To verify before running:
 
 **Linux:**
 ```bash
