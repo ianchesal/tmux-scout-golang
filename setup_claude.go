@@ -140,7 +140,7 @@ func claudeUninstall(settingsPath string) (string, error) {
 	}
 	hooksMap, ok := s["hooks"].(map[string]interface{})
 	if !ok {
-		return "skipped", nil
+		return "not_found", nil
 	}
 
 	changed := false
