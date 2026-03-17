@@ -17,10 +17,10 @@ var geminiHookEvents = []string{
 }
 
 type geminiHookEntry struct {
-	Name    string `json:"name"`
+	Name    string `json:"name"`    // required by Gemini CLI hook schema; not present in Claude hook entries
 	Type    string `json:"type"`
 	Command string `json:"command"`
-	Timeout int    `json:"timeout"`
+	Timeout int    `json:"timeout"` // milliseconds (Gemini CLI), unlike Claude which uses seconds
 }
 
 type geminiMatcherGroup struct {
