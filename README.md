@@ -12,10 +12,6 @@ This started out as a Golang rewrite of [tmux-scout](https://github.com/qeesung/
 
 A tmux plugin for monitoring and navigating [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex](https://github.com/openai/codex), and [Gemini CLI](https://github.com/google-gemini/gemini-cli) sessions. Provides a real-time fzf picker to jump between agent panes, a status bar widget showing session counts, and crash detection for dead sessions.
 
-## WARNING
-
-This is still a work in progress. As of now, only the Claude Code paths have been thoroughly tested. The Codex and Gemini CLI paths probably work, but are less tested.
-
 ## Features
 
 - **Session picker** — `prefix + O` opens an fzf popup listing all active agent sessions with status tags (`WAIT` / `BUSY` / `DONE` / `IDLE`), project names, prompt titles, and live tool details
@@ -197,7 +193,7 @@ Sessions older than 24 hours are automatically cleaned up.
 
 ## Known Issues
 
-* The Codex and Gemini CLI paths are less tested than the Claude Code paths
+* The Codex path isn't very well tested at this point
 
 
 ## Security
@@ -219,6 +215,9 @@ shasum -a 256 -c SHA256SUMS
 ## See Also
 
 * [qeesung/tmux-scout](https://github.com/qeesung/tmux-scout) -- the genesis for this project came about after they posted this to the r/tmux sub-reddit. I wanted a binary approach to doing what they were doing and took on rewriting it all in Golang. All credit belongs to qeesung for the original idea and implementation here.
+* [gavraz/recon](https://github.com/gavraz/recon) -- similar idea but Rust-based. Has a pretty cool Tamagotchi thing going on that I did.
+* [tmux-plugins/tmp](https://github.com/tmux-plugins/tpm) -- the Tmux Plugin Manager. It's just easier this way.
+* [go.dev](https://go.dev/) -- the Go programming language.
 
 
 ## License
