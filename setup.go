@@ -105,27 +105,27 @@ func runSetup(args []string) {
 
 	case "status":
 		if quiet {
-			// Used by tmux-scout.tmux at startup — exit 1 if not installed
-			allOK := true
+			// Used by tmux-scout.tmux at startup — exit 1 if no tools are installed
+			anyOK := false
 			if doClaude {
 				n, _ := claudeStatus(claudeSettings)
-				if n < len(claudeHookEvents) {
-					allOK = false
+				if n >= len(claudeHookEvents) {
+					anyOK = true
 				}
 			}
 			if doCodex {
 				installed, _ := codexStatus(codexConfig)
-				if !installed {
-					allOK = false
+				if installed {
+					anyOK = true
 				}
 			}
 			if doGemini {
 				n, _ := geminiStatus(geminiSettings)
-				if n < len(geminiHookEvents) {
-					allOK = false
+				if n >= len(geminiHookEvents) {
+					anyOK = true
 				}
 			}
-			if !allOK {
+			if !anyOK {
 				os.Exit(1)
 			}
 			return
