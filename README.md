@@ -12,6 +12,25 @@ This started out as a Golang rewrite of [tmux-scout](https://github.com/qeesung/
 
 A tmux plugin for monitoring and navigating [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex](https://github.com/openai/codex), and [Gemini CLI](https://github.com/google-gemini/gemini-cli) sessions. Provides a real-time fzf picker to jump between agent panes, a status bar widget showing session counts, and crash detection for dead sessions.
 
+## Upgrading from v0.2.x
+
+**v0.3.0 moves session data and the binary — a one-time migration is required.**
+
+| What changed | Old path | New path |
+|---|---|---|
+| Session data | `~/.tmux-scout/` | `~/.cache/tmux-scout/` (XDG) |
+| Binary | `$PLUGIN_DIR/bin/tmux-scout` | `~/.local/bin/tmux-scout` (symlink, if `~/.local/bin` exists) |
+
+After updating the plugin, reload tmux — you will see a warning message if migration is needed. Then run:
+
+```bash
+tmux-scout migrate
+```
+
+This moves your data, creates the symlink, and reinstalls hooks in Claude Code, Codex, and Gemini with the correct binary path. It is safe to re-run. See [XDG Support](#xdg-support) for full details.
+
+---
+
 ## Features
 
 - **Session picker** — `prefix + O` opens an fzf popup listing all active agent sessions with status tags (`WAIT` / `BUSY` / `DONE` / `IDLE`), project names, prompt titles, and live tool details
@@ -178,10 +197,10 @@ Placeholders: `{W}` wait, `{B}` busy, `{D}` done, `{I}` idle.
 
 ## Data Storage
 
-Session data is stored in `~/.tmux-scout/`:
+Session state is stored in `~/.cache/tmux-scout/` by default (XDG-compliant). See [XDG Support](#xdg-support) for full details and migration instructions.
 
 ```
-~/.tmux-scout/
+~/.cache/tmux-scout/
 ├── status.json                      # Aggregated session index
 ├── sessions/                        # Per-session JSON files
 │   ├── {session-id}.json
@@ -190,6 +209,34 @@ Session data is stored in `~/.tmux-scout/`:
 ```
 
 Sessions older than 24 hours are automatically cleaned up.
+
+## XDG Support
+
+tmux-scout follows the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/).
+
+**Data directory** — session state is stored in:
+
+| Condition | Path |
+|-----------|------|
+| `$XDG_CACHE_HOME` is set | `$XDG_CACHE_HOME/tmux-scout` |
+| Default | `~/.cache/tmux-scout` |
+
+**Binary** — after download or build, `~/.local/bin/tmux-scout` is symlinked to the plugin's binary if `~/.local/bin` exists. The symlink updates automatically whenever the plugin downloads or builds a new version.
+
+### Migrating from an older install
+
+If you have existing data in `~/.tmux-scout` from a pre-XDG version, run:
+
+```bash
+tmux-scout migrate
+```
+
+This will:
+1. Move `~/.tmux-scout` → `~/.cache/tmux-scout` (or `$XDG_CACHE_HOME/tmux-scout`)
+2. Symlink `~/.local/bin/tmux-scout` → plugin binary (if `~/.local/bin` exists)
+3. Reinstall hooks in Claude Code, Codex, and Gemini configs with the new binary path
+
+The migration is safe to re-run and never overwrites existing data at the destination.
 
 ## Known Issues
 
