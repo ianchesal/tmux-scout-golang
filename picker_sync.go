@@ -480,7 +480,7 @@ var (
 )
 
 func detectPaneState(paneID, agentType string) string {
-	out, err := exec.Command("tmux", "capture-pane", "-t", paneID, "-p", "-S", "-15").Output() //nolint:gosec // #nosec G204 G702 -- paneID is a tmux pane identifier sourced from tmux's own session list, not user input
+	out, err := exec.Command("tmux", "capture-pane", "-t", paneID, "-p", "-S", "-15").Output() // #nosec G204 G702 -- paneID is a tmux pane identifier sourced from tmux's own session list, not user input
 	if err != nil {
 		return ""
 	}
