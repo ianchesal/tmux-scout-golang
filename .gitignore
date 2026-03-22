@@ -2,8 +2,10 @@
 .DS_Store
 .claude/
 .vscode/
+.superpowers/
 bin/tmux-scout
 bin/tmux-scout-darwin-*
 bin/tmux-scout-linux-*
 docs/superpowers
 tmux-scout
+tmux-scout-golang
