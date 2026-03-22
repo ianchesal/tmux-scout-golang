@@ -34,9 +34,9 @@ This moves your data, creates the symlink, and reinstalls hooks in Claude Code, 
 ## Features
 
 - **Session picker** — `prefix + O` opens an fzf popup listing all active agent sessions with status tags (`WAIT` / `BUSY` / `DONE` / `IDLE`), project names, prompt titles, and live tool details
-- **Pane preview** — right-side preview panel shows the last 40 lines of each session's tmux pane
+- **Pane preview** — right-side preview panel shows a structured header (agent, status, dir, session ID) followed by cleaned terminal output (last 25 lines)
 - **Status bar widget** — displays session counts by status (e.g. `0|1|2`) in tmux's status-right, refreshed every 2 seconds
-- **Auto-refresh** — `Ctrl-T` toggles automatic picker reload every 2 seconds
+- **Auto-refresh** — enabled by default; `Ctrl-T` toggles automatic picker reload every 2 seconds
 - **Crash detection** — dead processes and stale Codex JSONL files are automatically detected and cleaned up
 
 ## Requirements
@@ -142,11 +142,11 @@ Press `prefix + O` (default) to open the session picker.
 Each line shows:
 
 ```
-* [ BUSY ] claude  my-project                "implement the login page"  Bash: npm test
+* BUSY claude  my-project                "implement the login page"  Bash: npm test
 ```
 
 - `*` — current pane indicator
-- `[ WAIT ]` / `[ BUSY ]` / `[ DONE ]` / `[ IDLE ]` — session status
+- `WAIT` / `BUSY` / `DONE` / `IDLE` — session status
 - Agent type (claude / codex / gemini)
 - Project directory name
 - Session title (first prompt)
@@ -184,6 +184,13 @@ Where `W` = waiting for attention (red), `B` = busy/working (yellow), `D` = done
 
 ```bash
 set -g @scout-key "O"    # default: O (prefix + O)
+```
+
+### Picker Size
+
+```bash
+set -g @scout_picker_width  85   # default: 85% of terminal width
+set -g @scout_picker_height 75   # default: 75% of terminal height
 ```
 
 ### Status Bar

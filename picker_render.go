@@ -104,13 +104,13 @@ func formatLine(s Session, currentPane string) string {
 		paneID = *s.TmuxPane
 	}
 
-	tag := "\x1b[34mIDLE\x1b[0m"
+	tag := "\x1b[34mIDLE\x1b[0m  "
 	if isNeedsAttention(s) {
-		tag = "\x1b[31mWAIT\x1b[0m"
+		tag = "\x1b[31mWAIT\x1b[0m  "
 	} else if s.Status == "working" {
-		tag = "\x1b[33mBUSY\x1b[0m"
+		tag = "\x1b[33mBUSY\x1b[0m  "
 	} else if s.Status == "completed" {
-		tag = "\x1b[32mDONE\x1b[0m"
+		tag = "\x1b[32mDONE\x1b[0m  "
 	}
 
 	cur := " "
@@ -177,7 +177,7 @@ func Render(sf StatusFile, currentPane string, panes map[string]paneInfo) {
 	})
 
 	hProject := fmt.Sprintf("%-25s", "PROJECT")
-	fmt.Printf("_\t  STAT AGENT  %s TITLE\n", hProject)
+	fmt.Printf("_\t  STATUS AGENT  %s TITLE\n", hProject)
 
 	if len(active) == 0 {
 		fmt.Println("NONE\tNo active sessions found.")
