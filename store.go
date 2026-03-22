@@ -78,7 +78,7 @@ func writeAtomic(path string, data []byte) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
 	}
-	if err := os.WriteFile(tmp, data, 0644); err != nil {
+	if err := os.WriteFile(tmp, data, 0644); err != nil { //nolint:gosec // #nosec G703 -- tmp path is constructed internally via fmt.Sprintf from a caller-controlled path, not from user input
 		os.Remove(tmp)
 		return err
 	}
