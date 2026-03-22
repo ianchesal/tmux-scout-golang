@@ -9,3 +9,4 @@ bin/tmux-scout-linux-*
 docs/superpowers
 tmux-scout
 tmux-scout-golang
+.worktrees/

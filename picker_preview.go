@@ -98,7 +98,7 @@ func printPreviewHeader(s Session) {
 }
 
 func printPreviewCapture(paneID string) {
-	out, err := exec.Command("tmux", "capture-pane", "-pJ", "-t", paneID).Output()
+	out, err := exec.Command("tmux", "capture-pane", "-pJ", "-t", paneID).Output() //nolint:gosec // #nosec G204 G702 -- paneID is a tmux pane identifier sourced from tmux's own session list, not user input
 	if err != nil || len(strings.TrimSpace(string(out))) == 0 {
 		fmt.Println("(session ended)")
 		return
