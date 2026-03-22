@@ -99,6 +99,25 @@ func TestWriteReadSession_RoundTrip(t *testing.T) {
 	}
 }
 
+func TestDefaultScoutDir_XDGSet(t *testing.T) {
+	t.Setenv("XDG_CACHE_HOME", "/custom/cache")
+	got := defaultScoutDir()
+	want := "/custom/cache/tmux-scout"
+	if got != want {
+		t.Errorf("defaultScoutDir() = %q, want %q", got, want)
+	}
+}
+
+func TestDefaultScoutDir_XDGEmpty(t *testing.T) {
+	t.Setenv("XDG_CACHE_HOME", "")
+	got := defaultScoutDir()
+	home, _ := os.UserHomeDir()
+	want := filepath.Join(home, ".cache", "tmux-scout")
+	if got != want {
+		t.Errorf("defaultScoutDir() = %q, want %q", got, want)
+	}
+}
+
 func TestPurgeOldSessions(t *testing.T) {
 	old := int64(1000) // very old endedAt
 	recent := NowMs() - 1000

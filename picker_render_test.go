@@ -84,8 +84,11 @@ func TestFormatLine_WaitTag(t *testing.T) {
 	if !strings.HasPrefix(line, "%5\t") {
 		t.Errorf("line should start with pane ID: %q", line)
 	}
-	if !strings.Contains(line, "[ WAIT ]") {
+	if !strings.Contains(line, "WAIT") {
 		t.Errorf("WAIT tag expected in: %q", line)
+	}
+	if strings.Contains(line, "[ WAIT ]") {
+		t.Errorf("brackets should be removed from tag: %q", line)
 	}
 }
 
@@ -147,5 +150,101 @@ func TestFormatLine_GeminiAgent(t *testing.T) {
 	line := formatLine(s, "")
 	if !strings.Contains(line, "gemini") {
 		t.Errorf("gemini agent label expected in line: %q", line)
+	}
+}
+
+func TestFormatLine_BusyTagNoBrackets(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "claude",
+		Status:           "working",
+		WorkingDirectory: "/home/user/proj",
+		TmuxPane:         strPtr("%1"),
+	}
+	line := formatLine(s, "")
+	if !strings.Contains(line, "BUSY") {
+		t.Errorf("BUSY tag expected: %q", line)
+	}
+	if strings.Contains(line, "[ BUSY ]") {
+		t.Errorf("brackets must be gone: %q", line)
+	}
+}
+
+func TestFormatLine_DoneTagNoBrackets(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "claude",
+		Status:           "completed",
+		WorkingDirectory: "/home/user/proj",
+		TmuxPane:         strPtr("%1"),
+	}
+	line := formatLine(s, "")
+	if !strings.Contains(line, "DONE") {
+		t.Errorf("DONE tag expected: %q", line)
+	}
+	if strings.Contains(line, "[ DONE ]") {
+		t.Errorf("brackets must be gone: %q", line)
+	}
+}
+
+func TestFormatLine_IdleTagNoBrackets(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "claude",
+		Status:           "idle",
+		WorkingDirectory: "/home/user/proj",
+		TmuxPane:         strPtr("%1"),
+	}
+	line := formatLine(s, "")
+	if !strings.Contains(line, "IDLE") {
+		t.Errorf("IDLE tag expected: %q", line)
+	}
+	if strings.Contains(line, "[ IDLE ]") {
+		t.Errorf("brackets must be gone: %q", line)
+	}
+}
+
+func TestFormatLine_TitleWithSpaceShown(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "claude",
+		Status:           "working",
+		WorkingDirectory: "/home/user/proj",
+		SessionTitle:     "Fix the auth bug",
+		TmuxPane:         strPtr("%1"),
+	}
+	line := formatLine(s, "")
+	if !strings.Contains(line, "Fix the auth bug") {
+		t.Errorf("human-readable title should appear: %q", line)
+	}
+}
+
+func TestFormatLine_TitleWithoutSpaceSuppressed(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "claude",
+		Status:           "working",
+		WorkingDirectory: "/home/user/proj",
+		SessionTitle:     "xK9mP2abc",
+		TmuxPane:         strPtr("%1"),
+	}
+	line := formatLine(s, "")
+	if strings.Contains(line, "xK9mP2abc") {
+		t.Errorf("identifier-like title should be suppressed: %q", line)
+	}
+}
+
+func TestFormatLine_TitleWhitespaceOnlySuppressed(t *testing.T) {
+	s := Session{
+		SessionID:        "s1",
+		AgentType:        "claude",
+		Status:           "working",
+		WorkingDirectory: "/home/user/proj",
+		SessionTitle:     "   ",
+		TmuxPane:         strPtr("%1"),
+	}
+	line := formatLine(s, "")
+	if strings.Contains(line, `""`) {
+		t.Errorf("whitespace-only title should not produce empty quoted string: %q", line)
 	}
 }
