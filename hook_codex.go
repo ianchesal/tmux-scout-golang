@@ -28,7 +28,7 @@ func forwardToOriginalNotify(jsonArg string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	args := append(orig.Notify[1:], jsonArg)
-	cmd := exec.CommandContext(ctx, orig.Notify[0], args...) // #nosec G204 -- command sourced from user's own backed-up Codex config, not external input
+	cmd := exec.CommandContext(ctx, orig.Notify[0], args...) // #nosec G204 G702 -- command sourced from user's own backed-up Codex config, not external input
 	_ = cmd.Run()
 }
 
