@@ -51,7 +51,7 @@ jobs:
         with:
           go-version: stable
       - name: Run gosec
-        uses: securego/gosec@v2.21.4
+        uses: securego/gosec@v2.25.0
         with:
           args: '-conf .gosec.yaml -severity medium -fmt sarif -out gosec.sarif ./...'
       - name: Upload SARIF
