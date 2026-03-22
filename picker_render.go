@@ -104,13 +104,13 @@ func formatLine(s Session, currentPane string) string {
 		paneID = *s.TmuxPane
 	}
 
-	tag := "\x1b[34m[ IDLE ]\x1b[0m"
+	tag := "\x1b[34mIDLE\x1b[0m"
 	if isNeedsAttention(s) {
-		tag = "\x1b[31m[ WAIT ]\x1b[0m"
+		tag = "\x1b[31mWAIT\x1b[0m"
 	} else if s.Status == "working" {
-		tag = "\x1b[33m[ BUSY ]\x1b[0m"
+		tag = "\x1b[33mBUSY\x1b[0m"
 	} else if s.Status == "completed" {
-		tag = "\x1b[32m[ DONE ]\x1b[0m"
+		tag = "\x1b[32mDONE\x1b[0m"
 	}
 
 	cur := " "
@@ -138,10 +138,13 @@ func formatLine(s Session, currentPane string) string {
 	if s.SessionTitle != "" {
 		t := strings.ReplaceAll(s.SessionTitle, "\r", " ")
 		t = strings.ReplaceAll(t, "\n", " ")
-		if len(t) > 50 {
-			t = t[:50]
+		t = strings.TrimSpace(t)
+		if len(t) > 0 && strings.Contains(t, " ") {
+			if len(t) > 50 {
+				t = t[:50]
+			}
+			title = fmt.Sprintf("\x1b[2m\"%s\"\x1b[0m", t)
 		}
-		title = fmt.Sprintf("\x1b[2m\"%s\"\x1b[0m", t)
 	}
 
 	detail := ""
@@ -173,9 +176,8 @@ func Render(sf StatusFile, currentPane string, panes map[string]paneInfo) {
 		return active[i].LastUpdated > active[j].LastUpdated
 	})
 
-	hStatus := fmt.Sprintf("%-8s", "STATUS ")
 	hProject := fmt.Sprintf("%-25s", "PROJECT")
-	fmt.Printf("_\t  %s AGENT  %s TITLE\n", hStatus, hProject)
+	fmt.Printf("_\t  STAT AGENT  %s TITLE\n", hProject)
 
 	if len(active) == 0 {
 		fmt.Println("NONE\tNo active sessions found.")

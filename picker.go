@@ -5,3 +5,7 @@ func runPicker(statusFilePath, currentPane string) {
 	result := Sync(statusFilePath, scoutDir)
 	Render(result.Status, currentPane, result.Panes)
 }
+
+func runPickerPreview(paneID, statusFile string) {
+	PreviewPane(paneID, statusFile)
+}

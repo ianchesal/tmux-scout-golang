@@ -27,6 +27,7 @@ make tag        # verify preconditions, run tests, tag, and push to trigger GitH
 | `hook gemini` | Process Gemini CLI hook events (reads env vars, updates session JSON) |
 | `setup install\|uninstall\|status [--claude\|--codex\|--gemini]` | Install/remove hooks in Claude Code, Codex, and Gemini CLI configs |
 | `picker <status-file> <current-pane>` | Render fzf picker lines |
+| `picker preview <pane-id> <status-file>` | Render structured pane preview (metadata header + filtered terminal output) |
 | `picker sync` | Sync session state (poll Codex JSONL, detect crashes) |
 | `status-bar` | Emit status bar widget string |
 
@@ -39,7 +40,7 @@ make tag        # verify preconditions, run tests, tag, and push to trigger GitH
 - `store.go` — types + session read/write
 - `hook_claude.go`, `hook_codex.go`, `hook_gemini.go` — hook handlers
 - `setup.go`, `setup_claude.go`, `setup_codex.go`, `setup_gemini.go` — installer
-- `picker.go`, `picker_sync.go`, `picker_render.go` — picker logic
+- `picker.go`, `picker_sync.go`, `picker_render.go`, `picker_preview.go` — picker logic
 - `status_bar.go` — status widget
 
 ## Key Constraints

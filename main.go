@@ -37,11 +37,19 @@ func main() {
 	case "setup":
 		runSetup(os.Args[2:])
 	case "picker":
-		if len(os.Args) < 4 {
-			fmt.Fprintln(os.Stderr, "usage: tmux-scout picker <status-file> <current-pane>")
-			os.Exit(1)
+		if len(os.Args) >= 3 && os.Args[2] == "preview" {
+			if len(os.Args) < 5 {
+				fmt.Fprintln(os.Stderr, "usage: tmux-scout picker preview <pane-id> <status-file>")
+				os.Exit(1)
+			}
+			runPickerPreview(os.Args[3], os.Args[4])
+		} else {
+			if len(os.Args) < 4 {
+				fmt.Fprintln(os.Stderr, "usage: tmux-scout picker <status-file> <current-pane>")
+				os.Exit(1)
+			}
+			runPicker(os.Args[2], os.Args[3])
 		}
-		runPicker(os.Args[2], os.Args[3])
 	case "status-bar":
 		runStatusBar()
 	case "migrate":
@@ -67,6 +75,8 @@ Commands:
                            Manage tmux-scout hooks
   picker <status-file> <current-pane>
                            Output fzf-ready session list
+  picker preview <pane-id> <status-file>
+                           Output structured pane preview
   status-bar               Output tmux status-right widget
   migrate                  Migrate data from ~/.tmux-scout to XDG path
 `)
