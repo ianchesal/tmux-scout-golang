@@ -102,6 +102,21 @@ fi
 key=$(tmux show-option -gqv "@scout-key")
 [ -z "$key" ] && key="O"
 tmux set-environment -g SCOUT_DIR "$CURRENT_DIR"
+
+# XDG binary placement: symlink into ~/.local/bin if it exists
+_scout_binary="$CURRENT_DIR/bin/tmux-scout"
+if [ -d "$HOME/.local/bin" ]; then
+  ln -sf "$_scout_binary" "$HOME/.local/bin/tmux-scout" 2>/dev/null && \
+    _scout_binary="$HOME/.local/bin/tmux-scout"
+fi
+tmux set-environment -g SCOUT_BINARY "$_scout_binary"
+
+# XDG migration notice: warn if old data dir exists but new one doesn't
+_xdg_cache="${XDG_CACHE_HOME:-$HOME/.cache}"
+if [ -d "$HOME/.tmux-scout" ] && [ ! -d "$_xdg_cache/tmux-scout" ]; then
+  tmux display-message "tmux-scout: data dir has moved to $_xdg_cache/tmux-scout — run: tmux-scout migrate"
+fi
+
 tmux bind-key "$key" run-shell -b "$CURRENT_DIR/scripts/picker/picker.sh"
 tmux run-shell -b "\"$CURRENT_DIR/bin/tmux-scout\" setup status --quiet 2>/dev/null || tmux display-message 'tmux-scout: hooks not installed. Run: $CURRENT_DIR/scripts/setup.sh install'"
 

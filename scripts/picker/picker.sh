@@ -4,11 +4,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCOUT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-STATUS_FILE="$HOME/.tmux-scout/status.json"
+
+# XDG data directory — must precede --generate guard so both code paths get correct value
+SCOUT_DATA_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/tmux-scout"
+STATUS_FILE="$SCOUT_DATA_DIR/status.json"
+
+# Resolve binary — tmux env is not inherited by fzf's bash $0 --generate self-invocations
+_sb=$(tmux show-environment SCOUT_BINARY 2>/dev/null | sed 's/^SCOUT_BINARY=//' || true)
+[ -n "$_sb" ] && SCOUT_BINARY="$_sb"
+: "${SCOUT_BINARY:=$SCOUT_DIR/bin/tmux-scout}"
 
 # --generate: called by fzf ctrl-r reload
 if [ "${1:-}" = "--generate" ]; then
-  "$SCOUT_DIR/bin/tmux-scout" picker "$STATUS_FILE" "${2:-}"
+  "$SCOUT_BINARY" picker "$STATUS_FILE" "${2:-}"
   exit 0
 fi
 
@@ -18,21 +26,16 @@ if [ ! -f "$STATUS_FILE" ]; then
 fi
 
 CURRENT_PANE=$(tmux display-message -p '#{pane_id}' 2>/dev/null || true)
+PICKER_WIDTH=$(tmux show-option -gqv @scout_picker_width 2>/dev/null)
+PICKER_HEIGHT=$(tmux show-option -gqv @scout_picker_height 2>/dev/null)
+: "${PICKER_WIDTH:=85}"
+: "${PICKER_HEIGHT:=75}"
 RELOAD_CMD="bash $(printf '%q' "$0") --generate $(printf '%q' "$CURRENT_PANE")"
 AUTO_FLAG="/tmp/tmux-scout-auto-$$"
 LISTEN_PORT=$((10000 + RANDOM % 50000))
 
 # Auto-refresh on by default
 touch "$AUTO_FLAG"
-
-# Cache lines and compute popup height
-LINES_FILE=$(mktemp /tmp/tmux-scout-lines.XXXXXX)
-"$SCOUT_DIR/bin/tmux-scout" picker "$STATUS_FILE" "$CURRENT_PANE" > "$LINES_FILE"
-lines=$(wc -l < "$LINES_FILE" | tr -d ' ')
-# items + header-line + fzf header + separator + prompt + border(2) + padding
-height=$((lines + 8))
-[ "$height" -lt 12 ] && height=12
-[ "$height" -gt 30 ] && height=30
 
 # Background auto-refresh daemon: polls flag every 2s, sends reload via fzf --listen
 (
@@ -47,9 +50,9 @@ height=$((lines + 8))
 ) &
 AUTO_PID=$!
 
-selected=$(cat "$LINES_FILE" | fzf \
+selected=$("$SCOUT_BINARY" picker "$STATUS_FILE" "$CURRENT_PANE" | fzf \
   --listen=$LISTEN_PORT \
-  --tmux "center,85%,$height,border-native" \
+  --tmux "center,${PICKER_WIDTH}%,${PICKER_HEIGHT}%,border-native" \
   --ansi \
   --no-mouse \
   --prompt='> ' \
@@ -60,7 +63,7 @@ selected=$(cat "$LINES_FILE" | fzf \
   --header-lines=1 \
   --bind="ctrl-r:reload($RELOAD_CMD)" \
   --bind="ctrl-t:execute-silent(if [ -f $AUTO_FLAG ]; then rm -f $AUTO_FLAG; else touch $AUTO_FLAG; fi)+reload($RELOAD_CMD)+transform:if [ -f $AUTO_FLAG ]; then printf \"change-border-label( tmux-scout · auto-refresh \$(date +%H:%M:%S) )\"; else printf 'change-border-label( tmux-scout )'; fi" \
-  --preview='tmux capture-pane -pJ -t {1} 2>/dev/null | tail -40' \
+  --preview="$SCOUT_BINARY picker preview {1} $(printf '%q' "$STATUS_FILE") 2>/dev/null" \
   --preview-window=right:50%:wrap:border-left \
   --preview-label=" pane preview " \
   --layout=reverse-list \
@@ -76,7 +79,7 @@ selected=$(cat "$LINES_FILE" | fzf \
   || true)
 
 kill $AUTO_PID 2>/dev/null; wait $AUTO_PID 2>/dev/null
-rm -f "$LINES_FILE" "$AUTO_FLAG"
+rm -f "$AUTO_FLAG"
 [ -z "$selected" ] && exit 0
 
 pane_id=$(echo "$selected" | cut -f1)
