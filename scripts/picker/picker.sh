@@ -10,7 +10,7 @@ SCOUT_DATA_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/tmux-scout"
 STATUS_FILE="$SCOUT_DATA_DIR/status.json"
 
 # Resolve binary — tmux env is not inherited by fzf's bash $0 --generate self-invocations
-_sb=$(tmux show-environment SCOUT_BINARY 2>/dev/null | sed 's/^SCOUT_BINARY=//')
+_sb=$(tmux show-environment SCOUT_BINARY 2>/dev/null | sed 's/^SCOUT_BINARY=//' || true)
 [ -n "$_sb" ] && SCOUT_BINARY="$_sb"
 : "${SCOUT_BINARY:=$SCOUT_DIR/bin/tmux-scout}"
 
