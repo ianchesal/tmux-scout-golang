@@ -44,6 +44,8 @@ func main() {
 		runPicker(os.Args[2], os.Args[3])
 	case "status-bar":
 		runStatusBar()
+	case "migrate":
+		runMigrate()
 	case "--version", "-version":
 		fmt.Println(version)
 		os.Exit(0)
@@ -66,6 +68,7 @@ Commands:
   picker <status-file> <current-pane>
                            Output fzf-ready session list
   status-bar               Output tmux status-right widget
+  migrate                  Migrate data from ~/.tmux-scout to XDG path
 `)
 }
 

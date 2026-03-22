@@ -4,11 +4,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCOUT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-STATUS_FILE="$HOME/.tmux-scout/status.json"
+
+# XDG data directory — must precede --generate guard so both code paths get correct value
+SCOUT_DATA_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/tmux-scout"
+STATUS_FILE="$SCOUT_DATA_DIR/status.json"
+
+# Resolve binary — tmux env is not inherited by fzf's bash $0 --generate self-invocations
+_sb=$(tmux show-environment SCOUT_BINARY 2>/dev/null | sed 's/^SCOUT_BINARY=//')
+[ -n "$_sb" ] && SCOUT_BINARY="$_sb"
+: "${SCOUT_BINARY:=$SCOUT_DIR/bin/tmux-scout}"
 
 # --generate: called by fzf ctrl-r reload
 if [ "${1:-}" = "--generate" ]; then
-  "$SCOUT_DIR/bin/tmux-scout" picker "$STATUS_FILE" "${2:-}"
+  "$SCOUT_BINARY" picker "$STATUS_FILE" "${2:-}"
   exit 0
 fi
 
@@ -27,7 +35,7 @@ touch "$AUTO_FLAG"
 
 # Cache lines and compute popup height
 LINES_FILE=$(mktemp /tmp/tmux-scout-lines.XXXXXX)
-"$SCOUT_DIR/bin/tmux-scout" picker "$STATUS_FILE" "$CURRENT_PANE" > "$LINES_FILE"
+"$SCOUT_BINARY" picker "$STATUS_FILE" "$CURRENT_PANE" > "$LINES_FILE"
 lines=$(wc -l < "$LINES_FILE" | tr -d ' ')
 # items + header-line + fzf header + separator + prompt + border(2) + padding
 height=$((lines + 8))

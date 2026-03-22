@@ -58,8 +58,11 @@ func SanitizeID(id string) string {
 }
 
 func defaultScoutDir() string {
+	if xdg := os.Getenv("XDG_CACHE_HOME"); xdg != "" {
+		return filepath.Join(xdg, "tmux-scout")
+	}
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".tmux-scout")
+	return filepath.Join(home, ".cache", "tmux-scout")
 }
 
 func statusFilePath(scoutDir string) string {
