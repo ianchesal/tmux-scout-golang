@@ -173,10 +173,10 @@ set -g @minimal-tmux-status-right '#($SCOUT_DIR/scripts/status-widget.sh) #S'
 The widget shows:
 
 ```
-W|B|D
+W|B|D <tmux-session-name>
 ```
 
-Where `W` = waiting for attention (red), `B` = busy/working (yellow), `D` = done/completed (green). An optional `I` = idle (blue) appears when idle sessions exist.
+Where `W` = waiting for attention (red), `B` = busy/working (yellow), `D` = done/completed (green). An optional `I` = idle (blue) appears when idle sessions exist. _NOTE: omit the `#S` from the `status-right` string to omit `<tmux-session-name>`._
 
 ## Configuration
 
