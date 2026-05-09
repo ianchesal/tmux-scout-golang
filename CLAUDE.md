@@ -16,6 +16,14 @@ make release    # cross-compile for linux/darwin amd64/arm64
 make tag        # verify preconditions, run tests, tag, and push to trigger GitHub release
 ```
 
+## Releasing
+
+`main` is branch-protected — all changes (including version bumps) require a pull request.
+
+To cut a release, use the project Claude Code skill: say "cut a new release" and it will prompt for patch / minor / major, handle the branch + PR, and run `make tag` after the PR merges.
+
+Manually: create a branch, update `.version` to the new `vMAJOR.MINOR.PATCH`, commit, push, open a PR. After merge, pull `main` and run `make tag`.
+
 ## Architecture
 
 **Go binary subcommands:**
@@ -31,7 +39,7 @@ make tag        # verify preconditions, run tests, tag, and push to trigger GitH
 | `picker sync` | Sync session state (poll Codex JSONL, detect crashes) |
 | `status-bar` | Emit status bar widget string |
 
-**Data storage:** `~/.tmux-scout/`
+**Data storage:** `~/.cache/tmux-scout/` (XDG; respects `$XDG_CACHE_HOME`)
 - `status.json` — aggregated session index
 - `sessions/{id}.json` — per-session state files
 

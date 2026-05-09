@@ -92,13 +92,22 @@ make test
 
 > **Note:** Only repository admins can push `v*` tags. Releases are restricted to admins via GitHub tag protection rules.
 
-Update `.version`, commit and push to `main`, then:
+> **Note:** `main` is branch-protected — all changes must go through a pull request, including version bumps.
+
+### With Claude Code
+
+If you're using Claude Code, a project skill automates the full release workflow. Start a session in this repo and say something like "cut a new release" or "create a patch release". The skill will prompt you for the version type (patch / minor / major), handle the branch and PR, then tag after you confirm the merge.
+
+### Manually
+
+1. Create a branch, update `.version` to the new `vMAJOR.MINOR.PATCH` string, commit, push, and open a PR.
+2. After the PR merges, pull `main` and run:
 
 ```bash
 make tag
 ```
 
-This checks that the working tree is clean, you're on `main`, there are no unpushed commits, and the tag doesn't already exist — then runs the test suite, creates the tag, and pushes it to trigger the GitHub Actions release workflow.
+`make tag` checks that the working tree is clean, you're on `main`, there are no unpushed commits, and the tag doesn't already exist — then runs the test suite, creates the tag, and pushes it to trigger the GitHub Actions release workflow.
 
 ## Hook Setup
 
